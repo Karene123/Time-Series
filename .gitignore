@@ -1,0 +1,6 @@
+# Inside Data
+data/raw/
+data/processed/
+
+# Inside models
+models/
