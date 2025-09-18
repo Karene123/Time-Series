@@ -213,6 +213,9 @@ fig4.show()
 fig5 = px.histogram(data_sliced, x='GDPC1')
 fig5.show()
 
+# Save the processed data
+data_sliced.to_csv('data/processed/eda_df.csv', index = False)
+
 """# Data Diagnosis"""
 
 CPIAUCSL_cyclic, CPIAUCSL_trend = hpfilter(data_sliced['CPIAUCSL'])
