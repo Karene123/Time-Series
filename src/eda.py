@@ -179,25 +179,17 @@ print(data_sliced)
 
 data_sliced.describe()
 
-# Distribution of CPI varible (right skewed)
-fig1 = px.histogram(data_sliced, x='CPIAUCSL')
-fig1.show()
+# Create a for loop to show all the distributions
+for col in data_sliced.columns:
+    # Check data type
+    if data_sliced[col].dtype in ['int64', 'float64']:
+        plt.figure(figsize=(8, 4))
+        plt.hist(data_sliced[col], edgecolor='black')
+        plt.title(f'Distribution of {col}')
+        plt.xlabel(col)
+        plt.ylabel('Frequency')
+        plt.show()
 
-# Distribution of FEDFUNDS variable (right skewed)
-fig2 = px.histogram(data_sliced, x='FEDFUNDS')
-fig2.show()
-
-# Distribution of M2SL variable (right skewed)
-fig3 = px.histogram(data_sliced, x='M2SL')
-fig3.show()
-
-# Distribution of M2V	 variable (right skewed)
-fig4 = px.histogram(data_sliced, x='M2V')
-fig4.show()
-
-# Distribution of GDPC1 variable (right skewed)
-fig5 = px.histogram(data_sliced, x='GDPC1')
-fig5.show()
 
 """# Data Diagnosis"""
 
