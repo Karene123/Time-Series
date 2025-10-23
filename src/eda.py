@@ -76,38 +76,41 @@ from statsmodels.graphics.gofplots import qqplot
 # === Statistical Tests (scipy) ===
 from scipy.stats import shapiro, kstest, normaltest, boxcox
 
-# Response Variable
-CPI_df = pd.read_excel('Time-Series/data/raw/CPIAUCSL(1).xlsx') #CPI for all urban customers
+filenames = ['CPIAUCSL(1).xlsx', 'FEDFUNDS(1).xlsx', 'GDPC1(1).xlsx', 'M2SL(1).xlsx', 'M2V(1).xlsx', 'DCOILBRENTEU(1).xlsx']
 
-print(CPI_df)
+# create a for loop to collect the data
+data_path = 'Time-Series/data/raw/'
+dic = {}
+for file in filenames:
+  file_path = os.path.join(data_path, file)
+  df = pd.read_excel(file_path)
+  dic[file] = df
+
+# Response Variable
+#CPI_df = pd.read_excel('Time-Series/data/raw/CPIAUCSL(1).xlsx') #CPI for all urban customers
 
 # Predictor variables
-FEDFUNDS_df = pd.read_excel('Time-Series/data/raw/FEDFUNDS(1).xlsx')
-GDP_df = pd.read_excel('Time-Series/data/raw/GDPC1(1).xlsx')
-M2SL_df = pd.read_excel('Time-Series/data/raw/M2SL(1).xlsx')
-M2V_df = pd.read_excel('Time-Series/data/raw/M2V(1).xlsx')
-DCOILBRENT_df = pd.read_excel('Time-Series/data/raw/DCOILBRENTEU(1).xlsx')
+#FEDFUNDS_df = pd.read_excel('Time-Series/data/raw/FEDFUNDS(1).xlsx')
+#GDP_df = pd.read_excel('Time-Series/data/raw/GDPC1(1).xlsx')
+#M2SL_df = pd.read_excel('Time-Series/data/raw/M2SL(1).xlsx')
+#M2V_df = pd.read_excel('Time-Series/data/raw/M2V(1).xlsx')
+#DCOILBRENT_df = pd.read_excel('Time-Series/data/raw/DCOILBRENTEU(1).xlsx')
 
-print(GDP_df)
+# Print all the dataframes
+files = [CPI_df, FEDFUNDS_df, GDP_df, M2SL_df, M2V_df]
+filenames = ['CPI_df', 'FEDFUNDS_df', 'GDP_df', 'M2SL_df', 'M2V_df']
 
-print(FEDFUNDS_df)
-
-print(M2SL_df)
-
-print(M2V_df)
+for i in range(5):
+  print(filenames[i])
+  print(files[i])
 
 """# Missing Data"""
 
 # check if there are any missing data
-CPI_df.isnull().sum()
-
-FEDFUNDS_df.isnull().sum()
-
-GDP_df.isnull().sum()
-
-M2SL_df.isnull().sum()
-
-M2V_df.isnull().sum()
+for filename, file in zip(filenames, files):
+    print(f"\n=== {filename} ===")
+    print("Missing values Table:")
+    print(file.isnull().sum())
 
 """# Merge"""
 
