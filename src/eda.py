@@ -26,25 +26,25 @@ import plotly.express as px
 !pip install sktime
 
 # === Forecasting Utilities (sktime) ===
-import sktime
-from sktime.forecasting.base import ForecastingHorizon
-from sktime.forecasting.compose import make_reduction, TransformedTargetForecaster
-from sktime.forecasting.naive import NaiveForecaster
-from sktime.forecasting.trend import PolynomialTrendForecaster
-from sktime.transformations.series.detrend import Detrender, Deseasonalizer
-from sktime.forecasting.all import (
-    Deseasonalizer, Detrender, temporal_train_test_split,
-    mean_absolute_percentage_error as mape,
-    mean_squared_percentage_error as mspe,
-    mean_squared_error as mse,
-    ForecastingHorizon,
-    NaiveForecaster,
-    TransformedTargetForecaster,
-    PolynomialTrendForecaster
-)
-from sktime.performance_metrics.forecasting import (
-    MeanAbsolutePercentageError, MeanSquaredError, MeanAbsoluteScaledError
-)
+#import sktime
+#from sktime.forecasting.base import ForecastingHorizon
+#from sktime.forecasting.compose import make_reduction, TransformedTargetForecaster
+#from sktime.forecasting.naive import NaiveForecaster
+#from sktime.forecasting.trend import PolynomialTrendForecaster
+#from sktime.transformations.series.detrend import Detrender, Deseasonalizer
+#from sktime.forecasting.all import (
+#    Deseasonalizer, Detrender, temporal_train_test_split,
+#    mean_absolute_percentage_error as mape,
+#    mean_squared_percentage_error as mspe,
+#    mean_squared_error as mse,
+#    ForecastingHorizon,
+#    NaiveForecaster,
+#    TransformedTargetForecaster,
+#    PolynomialTrendForecaster
+#)
+#from sktime.performance_metrics.forecasting import (
+#    MeanAbsolutePercentageError, MeanSquaredError, MeanAbsoluteScaledError
+#)
 
 # === Regressors (scikit-learn) ===
 #from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, ExtraTreesRegressor
@@ -56,22 +56,22 @@ from sktime.performance_metrics.forecasting import (
 # === ARIMA (pmdarima) ===
 
 # === Statistical Modeling (statsmodels) ===
-from statsmodels.tsa.filters.hp_filter import hpfilter
-from statsmodels.tsa.seasonal import seasonal_decompose
-from statsmodels.tsa.stattools import adfuller, kpss, grangercausalitytests
-from statsmodels.tsa.api import VAR
-from statsmodels.tsa.ar_model import AutoReg
-from statsmodels.stats.api import (
-    het_breuschpagan, het_goldfeldquandt, het_white,
-    jarque_bera, omni_normtest, normal_ad
-)
-from statsmodels.stats.diagnostic import (
-    kstest_normal, acorr_ljungbox
-)
-from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-from statsmodels.formula.api import ols
-from statsmodels.tools.tools import add_constant
-from statsmodels.graphics.gofplots import qqplot
+#from statsmodels.tsa.filters.hp_filter import hpfilter
+#from statsmodels.tsa.seasonal import seasonal_decompose
+#from statsmodels.tsa.stattools import adfuller, kpss, grangercausalitytests
+#from statsmodels.tsa.api import VAR
+#from statsmodels.tsa.ar_model import AutoReg
+#from statsmodels.stats.api import (
+#    het_breuschpagan, het_goldfeldquandt, het_white,
+#    jarque_bera, omni_normtest, normal_ad
+#)
+#from statsmodels.stats.diagnostic import (
+#    kstest_normal, acorr_ljungbox
+#)
+#from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+#from statsmodels.formula.api import ols
+#from statsmodels.tools.tools import add_constant
+#from statsmodels.graphics.gofplots import qqplot
 
 # === Statistical Tests (scipy) ===
 from scipy.stats import shapiro, kstest, normaltest, boxcox
