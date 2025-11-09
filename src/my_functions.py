@@ -20,3 +20,191 @@ def missing_value_percentage(df):
     missing_df = missing_df[missing_df['Missing Count'] > 0]
     return missing_df
 
+
+
+# function to print results
+def print_results(output, test='adf'):
+
+    test_score = output[0]
+    pval = output[1]
+    lags = output[2]
+
+    decision = 'Non-Stationary'
+    if test == 'adf':
+        critical = output[4]
+        if pval < 0.05:
+            decision = 'Stationary'
+    elif test=='kpss':
+        critical = output[3]
+        if pval >= 0.05:
+            decision = 'Stationary'
+
+    output_dict = {
+    'Test Statistic': test_score,
+    'p-value': pval,
+    'Numbers of lags': lags,
+    'decision': decision
+    }
+    for key, value in critical.items():
+        output_dict["Critical Value (%s)" % key] = value
+
+    return pd.Series(output_dict, name=test)
+
+
+# set up a generalized function for the plot labels
+def check_stationarity(df):
+    kps = kpss(df)
+    adf = adfuller(df)
+
+    kpss_pv, adf_pv = kps[1], adf[1]
+    kpssh, adfh = 'Stationary', 'Non-stationary'
+
+    if adf_pv < 0.05:
+        # Reject ADF Null Hypothesis
+        adfh = 'Stationary'
+    if kpss_pv < 0.05:
+        # Reject KPSS Null Hypothesis
+        kpssh = 'Non Stationary'
+    return (kpssh, adfh)
+
+#  set up the comparison plotting function
+def plot_comparison(methods, plot_type='line'):
+    n = len(methods) // 2
+    fig, ax = plt.subplots(n,2, sharex=True, figsize=(20,10))
+    for i, method in enumerate(methods):
+        method.dropna(inplace=True)
+        name = [n for n in globals() if globals()[n] is method]
+        v, r = i // 2, i % 2
+
+        kpss_s, adf_s = check_stationarity(method)
+
+        method.plot(kind=plot_type,
+                    ax=ax[v,r],
+                    legend=False,
+                    title=f'{name[0].upper()} KPSS={kpss_s}, ADF={adf_s}')
+        ax[v,r].title.set_size(14)
+        method.rolling(52).mean().plot(ax=ax[v,r], legend=False)
+
+def evaluate(df, y_train, sort_by='MASE'):
+    evals = pd.DataFrame(index=['sMAPE', 'MAPE', 'RMSE', 'MASE'])
+    y_truth = pd.Series(df['y'].values, index=df['y'].index, name='y')
+    y_predicted = df.drop(columns='y')
+    for p in y_predicted.columns:
+        y_pred = pd.Series(y_predicted[p].values, index=y_truth.index, name='y')
+        evals.loc['sMAPE', p] = mape(y_truth, y_pred, symmetric=True)
+        evals.loc['MAPE', p] = mape(y_truth, y_pred, symmetric=False)
+        evals.loc['RMSE', p] = np.sqrt(mse(y_truth, y_pred))
+        evals.loc['MASE', p] = mase(y_truth, y_pred, y_train=y_train)
+    return evals.T.sort_values(by=sort_by)
+
+"""
+simple RNN
+"""
+def create_model(train, units, dropout=0.2):
+    model = keras.Sequential()
+    model.add(SimpleRNN(units=units,
+                        return_sequences=False,
+                        input_shape=(train.shape[1],
+                                     train.shape[2])))
+    model.add(Dropout(dropout))
+    model.add(Dense(1))
+
+    return model
+
+def train_model_ts(model,
+                x_train, y_train, x_val, y_val,
+                epochs=500,
+                patience=12,
+                batch_size=32):
+
+    model.compile(optimizer='adam',
+                  loss='mean_squared_error',
+                  metrics=[RootMeanSquaredError(),
+                           MeanAbsoluteError()])
+
+    es = keras.callbacks.EarlyStopping(
+                    monitor="val_loss",
+                    min_delta=0,
+                    patience=patience)
+
+    history = model.fit(x_train,y_train,
+              shuffle=False, epochs=epochs,
+              batch_size=batch_size,
+              validation_data=(x_val, y_val),
+              callbacks=[es], verbose=1)
+    return history
+
+def plot_forecast(model, x_test, y_test, index, history):
+    fig, ax = plt.subplots(2, 1)
+    (pd.Series(history.history['loss'])
+                      .plot(style='k',alpha=0.50, title='Loss by Epoch',
+                            ax = ax[0], label='loss'))
+    (pd.Series(history.history['val_loss'])
+                      .plot(style='k',ax=ax[0],label='val_loss'))
+    ax[0].legend()
+    predicted = model.predict(x_test)
+    pd.Series(y_test.reshape(-1),
+              index=index).plot(style='k--', alpha=0.5, ax=ax[1],
+                                title='Forecast vs Actual',
+                                label='actual')
+    pd.Series(predicted.reshape(-1),
+              index=index).plot(
+            style='k',label='Forecast', ax=ax[1])
+    fig.tight_layout()
+    ax[1].legend()
+    plt.show()
+
+print('\nFunctions built')
+
+class Standardize:
+    def __init__(self, df, split=0.10):
+        self.data = df
+        self.split = split
+
+    def split_data(self):
+        n = int(len(self.data) * self.split)
+        train, test = self.data.iloc[:-n], self.data.iloc[-n:]
+        n = int(len(train) * self.split)
+        train, val = train.iloc[:-n], train.iloc[-n:]
+        assert len(test) + len(train) + len(val) == len(self.data)
+        return train, test, val
+
+    def _transform(self, data):
+        data_s = (data - self.mu)/self.sigma
+        return data_s
+
+    def fit_transform(self):
+        train, test, val = self.split_data()
+        self.mu, self.sigma = train.mean(), train.std()
+        train_s = self._transform(train)
+        test_s = self._transform(test)
+        val_s = self._transform(val)
+        return train_s, test_s, val_s
+
+    def inverse(self, data):
+        return (data * self.sigma)+self.mu
+
+    def inverse_y(self, data):
+        return (data * self.sigma[-1])+self.mu[-1]
+
+print('\nStandardize Class Built')
+
+def create_sequences(X_df, y_series, time_steps=12):
+    x_s, y_s = [], []
+    X = X_df.values
+    y = y_series.values
+    for i in range(len(X) - time_steps):
+        x_s.append(X[i:i+time_steps])
+        y_s.append(y[i+time_steps])
+    return np.array(x_s), np.array(y_s)
+
+def create_model(train, units, dropout=0.2):
+    model = keras.Sequential()
+    model.add(LSTM(units=units,input_shape=(train.shape[1], train.shape[2]), return_sequences=True))
+    model.add(Dropout(dropout))
+    model.add(LSTM(units=units))
+    model.add(Dropout(dropout))
+    model.add(Dense(1))
+
+    return model
+
