@@ -85,6 +85,12 @@ def plot_comparison(methods, plot_type='line'):
         ax[v,r].title.set_size(14)
         method.rolling(52).mean().plot(ax=ax[v,r], legend=False)
 
+# Need to create a function to plot first order differencing, second order differencing......for each explanatory variable
+
+# Need to create a function to remove progressively one variable
+
+# Need to create a function to plot gradient boosting regressor for different exp variables
+
 def evaluate(df, y_train, sort_by='MASE'):
     evals = pd.DataFrame(index=['sMAPE', 'MAPE', 'RMSE', 'MASE'])
     y_truth = pd.Series(df['y'].values, index=df['y'].index, name='y')
