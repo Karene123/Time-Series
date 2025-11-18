@@ -1,4 +1,18 @@
+# Main libraries
 pandas
 numpy
 scikit-learn
 matplotlib
+plotly
+seaborn
+warnings
+
+# For time series
+sktime
+scikit-learn
+statsmodels
+pmdarima
+tensorflow
+keras
+
+
