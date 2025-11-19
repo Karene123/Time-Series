@@ -1,18 +1,17 @@
 # Main libraries
-pandas
-numpy
-scikit-learn
-matplotlib
-plotly
-seaborn
+pandas==2.2.2
+numpy==2.0.2
+scikit-learn==1.6.1
+matplotlib==3.10.0
+plotly==5.24.1
+seaborn==0.13.2
 warnings
 
 # For time series
-sktime
-scikit-learn
-statsmodels
+sktime==0.39.0
+statsmodels==0.14.5
 pmdarima
-tensorflow
-keras
+tensorflow==2.19.0
+keras==7.34.0
 
 
